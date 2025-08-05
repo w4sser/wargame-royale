@@ -91,6 +91,18 @@
       "type": "unit",
       "description": "Slow but devastating",
       "emoji": "🗿"
+    },
+    {
+      "id": "tank",
+      "name": "Tank",
+      "cost": 7,
+      "hp": 1000,
+      "damage": 200,
+      "attackSpeed": 2.0,
+      "speed": 0.3,
+      "type": "unit",
+      "description": "Heavily armored war machine",
+      "emoji": "🚛"
     }
   ]
 }
