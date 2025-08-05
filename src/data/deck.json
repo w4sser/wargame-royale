@@ -1,0 +1,96 @@
+{
+  "cards": [
+    {
+      "id": "goblin",
+      "name": "Goblin",
+      "cost": 2,
+      "hp": 150,
+      "damage": 50,
+      "attackSpeed": 0.5,
+      "speed": 1,
+      "type": "unit",
+      "description": "Fast and nimble warrior",
+      "emoji": "👹"
+    },
+    {
+      "id": "archer",
+      "name": "Archer",
+      "cost": 3,
+      "hp": 100,
+      "damage": 80,
+      "attackSpeed": 1.2,
+      "speed": 0.8,
+      "type": "unit",
+      "description": "Long-range specialist",
+      "emoji": "🏹"
+    },
+    {
+      "id": "knight",
+      "name": "Knight",
+      "cost": 4,
+      "hp": 300,
+      "damage": 120,
+      "attackSpeed": 1.5,
+      "speed": 0.6,
+      "type": "unit",
+      "description": "Heavy armored defender",
+      "emoji": "⚔️"
+    },
+    {
+      "id": "wizard",
+      "name": "Wizard",
+      "cost": 5,
+      "hp": 80,
+      "damage": 200,
+      "attackSpeed": 2.0,
+      "speed": 0.7,
+      "type": "unit",
+      "description": "Powerful magic caster",
+      "emoji": "🧙"
+    },
+    {
+      "id": "dragon",
+      "name": "Dragon",
+      "cost": 8,
+      "hp": 500,
+      "damage": 300,
+      "attackSpeed": 1.8,
+      "speed": 1.2,
+      "type": "unit",
+      "description": "Legendary flying beast",
+      "emoji": "🐉"
+    },
+    {
+      "id": "fireball",
+      "name": "Fireball",
+      "cost": 4,
+      "damage": 250,
+      "radius": 2,
+      "type": "spell",
+      "description": "Area damage spell",
+      "emoji": "🔥"
+    },
+    {
+      "id": "heal",
+      "name": "Heal",
+      "cost": 3,
+      "healing": 200,
+      "radius": 1,
+      "type": "spell",
+      "description": "Restore unit health",
+      "emoji": "💚"
+    },
+    {
+      "id": "giant",
+      "name": "Giant",
+      "cost": 6,
+      "hp": 800,
+      "damage": 150,
+      "attackSpeed": 2.5,
+      "speed": 0.4,
+      "type": "unit",
+      "description": "Slow but devastating",
+      "emoji": "🗿"
+    }
+  ]
+}
