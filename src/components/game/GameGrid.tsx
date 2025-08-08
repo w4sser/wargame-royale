@@ -56,10 +56,10 @@ export const GameGrid: React.FC<GameGridProps> = ({
   };
 
   return (
-    <div className="game-grid max-w-3xl max-h-[90vh] aspect-[8/18] relative">
+    <div className="game-grid max-w-3xl max-h-[90vh] aspect-[9/22] relative">
       {/* Grid cells */}
-      {Array.from({ length: 18 }, (_, row) =>
-        Array.from({ length: 8 }, (_, col) => renderCell(row, col))
+      {Array.from({ length: 22 }, (_, row) =>
+        Array.from({ length: 9 }, (_, col) => renderCell(row, col))
       )}
       
       {/* Center line */}
