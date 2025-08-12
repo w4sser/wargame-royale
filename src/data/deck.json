@@ -10,7 +10,8 @@
       "speed": 1,
       "type": "unit",
       "description": "Fast and nimble warrior",
-      "emoji": "👹"
+      "icon": "Users",
+      "flying": false
     },
     {
       "id": "archer",
@@ -22,7 +23,8 @@
       "speed": 0.8,
       "type": "unit",
       "description": "Long-range specialist",
-      "emoji": "🏹"
+      "icon": "Target",
+      "flying": false
     },
     {
       "id": "knight",
@@ -34,7 +36,8 @@
       "speed": 0.6,
       "type": "unit",
       "description": "Heavy armored defender",
-      "emoji": "⚔️"
+      "icon": "Shield",
+      "flying": false
     },
     {
       "id": "wizard",
@@ -46,7 +49,8 @@
       "speed": 0.7,
       "type": "unit",
       "description": "Powerful magic caster",
-      "emoji": "🧙"
+      "icon": "Sparkles",
+      "flying": false
     },
     {
       "id": "dragon",
@@ -58,7 +62,8 @@
       "speed": 1.2,
       "type": "unit",
       "description": "Legendary flying beast",
-      "emoji": "🐉"
+      "icon": "Bird",
+      "flying": true
     },
     {
       "id": "fireball",
@@ -90,7 +95,8 @@
       "speed": 0.4,
       "type": "unit",
       "description": "Slow but devastating",
-      "emoji": "🗿"
+      "icon": "Mountain",
+      "flying": false
     },
     {
       "id": "tank",
@@ -102,7 +108,8 @@
       "speed": 0.3,
       "type": "unit",
       "description": "Heavily armored war machine",
-      "emoji": "🚛"
+      "icon": "Truck",
+      "flying": false
     },
     {
       "id": "engineer",
@@ -114,7 +121,8 @@
       "speed": 1.2,
       "type": "unit",
       "description": "Crosses river bridges quickly",
-      "emoji": "🚛"
+      "icon": "Wrench",
+      "flying": false
     }
   ]
 }

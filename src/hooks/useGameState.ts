@@ -41,6 +41,9 @@ export const useGameState = () => {
   const deployUnit = useCallback((card: any, row: number, col: number) => {
     if (elixir < card.cost) return;
 
+    // Determine target lane - move to closest road (col 2 or col 6)
+    const targetCol = Math.abs(col - 2) <= Math.abs(col - 6) ? 2 : 6;
+
     const newUnit: Unit = {
       id: `unit-${Date.now()}`,
       type: card.id,
@@ -53,7 +56,9 @@ export const useGameState = () => {
       speed: card.speed || 1,
       player: 'player',
       lastAttack: 0,
-      targetRow: 0 // Move towards enemy territory
+      targetRow: 0, // Move towards enemy territory
+      targetCol,
+      flying: card.flying || false
     };
 
     setUnits(prev => [...prev, newUnit]);
@@ -63,14 +68,35 @@ export const useGameState = () => {
   const updateUnits = useCallback(() => {
     setUnits(prev => prev.map(unit => {
       if (unit.player === 'player') {
-        // Move towards enemy territory
-        const newRow = Math.max(0, unit.row - (unit.speed * 0.1));
-        return { ...unit, row: newRow };
+        let newRow = unit.row;
+        let newCol = unit.col;
+        
+        // Move towards target lane first
+        if (Math.abs(unit.col - unit.targetCol) > 0.1) {
+          const colDirection = unit.targetCol > unit.col ? 1 : -1;
+          newCol = unit.col + (colDirection * unit.speed * 0.1);
+        } else {
+          // In target lane, move forward
+          // Check river crossing at row 13 for non-flying units
+          if (!unit.flying && unit.row > 13 && (unit.row - unit.speed * 0.1) < 13) {
+            // Can't cross river unless at bridges (col 2 or 6)
+            if (Math.abs(unit.col - 2) > 0.5 && Math.abs(unit.col - 6) > 0.5) {
+              // Stop at river if not at bridge
+              newRow = 13;
+            } else {
+              newRow = Math.max(0, unit.row - (unit.speed * 0.1));
+            }
+          } else {
+            newRow = Math.max(0, unit.row - (unit.speed * 0.1));
+          }
+        }
+        
+        return { ...unit, row: newRow, col: newCol };
       }
       return unit;
     }).filter(unit => unit.hp > 0));
 
-    // Simulate combat
+    // Simulate combat with tower protection logic
     setTowers(prev => prev.map(tower => {
       const nearbyEnemyUnits = units.filter(unit => 
         unit.player !== tower.player &&
@@ -79,11 +105,21 @@ export const useGameState = () => {
       );
 
       if (nearbyEnemyUnits.length > 0) {
+        // King tower protection - can only be attacked if side towers are destroyed
+        if (tower.id === 'enemy-king') {
+          const leftTower = towers.find(t => t.id === 'enemy-left');
+          const rightTower = towers.find(t => t.id === 'enemy-right');
+          
+          if ((leftTower && leftTower.hp > 0) && (rightTower && rightTower.hp > 0)) {
+            return tower; // King tower is protected
+          }
+        }
+        
         return { ...tower, hp: Math.max(0, tower.hp - 50) };
       }
       return tower;
     }));
-  }, [units]);
+  }, [units, towers]);
 
   const checkVictory = useCallback(() => {
     const playerKingTower = towers.find(t => t.id === 'player-king');

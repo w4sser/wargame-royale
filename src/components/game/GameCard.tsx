@@ -1,10 +1,12 @@
 import React from 'react';
+import { Users, Target, Shield, Sparkles, Bird, Mountain, Truck, Wrench } from 'lucide-react';
 
 interface Card {
   id: string;
   name: string;
   cost: number;
-  emoji: string;
+  emoji?: string;
+  icon?: string;
   description: string;
 }
 
@@ -38,7 +40,15 @@ export const GameCard: React.FC<GameCardProps> = ({
       onDragStart={handleDragStart}
     >
       <div className="text-center">
-        <div className="text-3xl mb-2">{card.emoji}</div>
+        <div className="text-3xl mb-2 flex justify-center">
+          {card.icon ? (() => {
+            const iconMap: { [key: string]: React.ComponentType<any> } = {
+              Users, Target, Shield, Sparkles, Bird, Mountain, Truck, Wrench
+            };
+            const IconComponent = iconMap[card.icon] || Users;
+            return <IconComponent size={24} className="text-primary" />;
+          })() : (card.emoji || '⚔️')}
+        </div>
         <div className="text-sm font-bold text-card-foreground mb-1">
           {card.name}
         </div>

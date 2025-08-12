@@ -11,6 +11,8 @@ export interface Unit {
   player: 'player' | 'enemy';
   lastAttack: number;
   targetRow: number;
+  targetCol: number;
+  flying: boolean;
 }
 
 export interface Tower {
@@ -37,7 +39,9 @@ export interface Card {
   speed?: number;
   type: 'unit' | 'spell';
   description: string;
-  emoji: string;
+  icon?: string;
+  emoji?: string;
   healing?: number;
   radius?: number;
+  flying?: boolean;
 }
