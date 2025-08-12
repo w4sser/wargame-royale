@@ -20,14 +20,14 @@ export const useGameState = () => {
 
     // Initialize towers
     setTowers([
-      // Player towers
-      { id: 'player-left', row: 16, col: 1, hp: 1000, maxHp: 1000, player: 'player' },
-      { id: 'player-right', row: 16, col: 6, hp: 1000, maxHp: 1000, player: 'player' },
-      { id: 'player-king', row: 17, col: 3, hp: 1500, maxHp: 1500, player: 'player' },
-      // Enemy towers
-      { id: 'enemy-left', row: 1, col: 1, hp: 1000, maxHp: 1000, player: 'enemy' },
-      { id: 'enemy-right', row: 1, col: 6, hp: 1000, maxHp: 1000, player: 'enemy' },
-      { id: 'enemy-king', row: 0, col: 3, hp: 1500, maxHp: 1500, player: 'enemy' },
+      // Player towers (evenly distributed at bottom)
+      { id: 'player-left', row: 19, col: 2, hp: 1000, maxHp: 1000, player: 'player' },
+      { id: 'player-right', row: 19, col: 6, hp: 1000, maxHp: 1000, player: 'player' },
+      { id: 'player-king', row: 20, col: 4, hp: 1500, maxHp: 1500, player: 'player' },
+      // Enemy towers (evenly distributed at top)
+      { id: 'enemy-left', row: 2, col: 2, hp: 1000, maxHp: 1000, player: 'enemy' },
+      { id: 'enemy-right', row: 2, col: 6, hp: 1000, maxHp: 1000, player: 'enemy' },
+      { id: 'enemy-king', row: 1, col: 4, hp: 1500, maxHp: 1500, player: 'enemy' },
     ]);
 
     // Elixir regeneration
@@ -56,7 +56,7 @@ export const useGameState = () => {
       speed: card.speed || 1,
       player: 'player',
       lastAttack: 0,
-      targetRow: 0, // Move towards enemy territory
+      targetRow: 1, // Move towards enemy king tower
       targetCol,
       flying: card.flying || false
     };
@@ -77,17 +77,17 @@ export const useGameState = () => {
           newCol = unit.col + (colDirection * unit.speed * 0.1);
         } else {
           // In target lane, move forward
-          // Check river crossing at row 13 for non-flying units
-          if (!unit.flying && unit.row > 13 && (unit.row - unit.speed * 0.1) < 13) {
+          // Check river crossing at row 11 for non-flying units
+          if (!unit.flying && unit.row > 11 && (unit.row - unit.speed * 0.1) < 11) {
             // Can't cross river unless at bridges (col 2 or 6)
             if (Math.abs(unit.col - 2) > 0.5 && Math.abs(unit.col - 6) > 0.5) {
               // Stop at river if not at bridge
-              newRow = 13;
+              newRow = 11;
             } else {
-              newRow = Math.max(0, unit.row - (unit.speed * 0.1));
+              newRow = Math.max(1, unit.row - (unit.speed * 0.1));
             }
           } else {
-            newRow = Math.max(0, unit.row - (unit.speed * 0.1));
+            newRow = Math.max(1, unit.row - (unit.speed * 0.1));
           }
         }
         

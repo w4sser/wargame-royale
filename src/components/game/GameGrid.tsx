@@ -17,8 +17,8 @@ export const GameGrid: React.FC<GameGridProps> = ({
   draggedCard
 }) => {
   const renderCell = (row: number, col: number) => {
-    const isEnemyTerritory = row < 9;
-    const isPlayerTerritory = row >= 9;
+    const isEnemyTerritory = row <= 10;
+    const isPlayerTerritory = row >= 12;
     const cellKey = `${row}-${col}`;
     
     // Check if there's a tower at this position
@@ -62,8 +62,8 @@ export const GameGrid: React.FC<GameGridProps> = ({
         Array.from({ length: 9 }, (_, col) => renderCell(row, col))
       )}
       
-      {/* Center line */}
-      <div className="absolute left-0 right-0 h-0.5 bg-primary/50" style={{ top: '50%' }} />
+      {/* River line */}
+      <div className="absolute left-0 right-0 h-1 bg-blue-500/60" style={{ top: `${(11/22) * 100}%` }} />
       
       {/* Units */}
       {units.map(unit => (
