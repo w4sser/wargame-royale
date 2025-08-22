@@ -1,5 +1,5 @@
 import React from 'react';
-import { Unit, Tower } from '../../types/game';
+import { Unit, Tower } from '../../types/cards'; // <-- change to '../../types/game' if that's your file
 import { GameUnit } from './GameUnit';
 import { GameTower } from './GameTower';
 
@@ -7,7 +7,7 @@ interface GameGridProps {
   units: Unit[];
   towers: Tower[];
   onCellDrop: (row: number, col: number) => void;
-  draggedCard: any;
+  draggedCard: unknown; // tighten later if you want
 }
 
 export const GameGrid: React.FC<GameGridProps> = ({
@@ -16,38 +16,33 @@ export const GameGrid: React.FC<GameGridProps> = ({
   onCellDrop,
   draggedCard
 }) => {
-  const renderCell = (row: number, col: number) => {
-    const isEnemyTerritory = row <= 10;
-    const isPlayerTerritory = row >= 12;
-    const cellKey = `${row}-${col}`;
-    
-    // Check if there's a tower at this position
-    const tower = towers.find(t => t.row === row && t.col === col);
-    
-    const handleDrop = (event: React.DragEvent) => {
-      event.preventDefault();
-      onCellDrop(row, col);
-    };
+  const numRows = 22;
+  const numCols = 9;
+  const midRow  = Math.floor(numRows / 2); // 11
 
-    const handleDragOver = (event: React.DragEvent) => {
-      event.preventDefault();
-    };
+  const renderCell = (row: number, col: number) => {
+    const isEnemyTerritory  = row < midRow;
+    const isPlayerTerritory = row >= midRow;
+    const cellKey = `${row}-${col}`;
+
+    const tower = towers.find(t => t.row === row && t.col === col);
+
+    const handleDrop = (e: React.DragEvent) => { e.preventDefault(); onCellDrop(row, col); };
+    const handleDragOver = (e: React.DragEvent) => e.preventDefault();
 
     return (
       <div
         key={cellKey}
-        className={`grid-cell ${isEnemyTerritory ? 'enemy-territory' : 'player-territory'} ${
+        className={`grid-cell relative ${isEnemyTerritory ? 'enemy-territory' : 'player-territory'} ${
           draggedCard && isPlayerTerritory ? 'hover:bg-primary/20' : ''
         }`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
       >
-        {/* Tower */}
         {tower && <GameTower tower={tower} />}
-        
-        {/* Lane indicators for middle columns */}
+
         {(col === 1 || col === 3 || col === 4 || col === 6) && (
-          <div className="absolute inset-0 opacity-20">
+          <div className="absolute inset-0 opacity-20 pointer-events-none">
             <div className="w-full h-full border-l-2 border-dashed border-primary/30" />
           </div>
         )}
@@ -56,19 +51,25 @@ export const GameGrid: React.FC<GameGridProps> = ({
   };
 
   return (
-    <div className="game-grid max-w-3xl max-h-[90vh] aspect-[9/22] relative">
-      {/* Grid cells */}
-      {Array.from({ length: 22 }, (_, row) =>
-        Array.from({ length: 9 }, (_, col) => renderCell(row, col))
+    <div
+      className="game-grid max-w-3xl max-h-[90vh] relative"
+      style={{
+        aspectRatio: `${numCols} / ${numRows}`,
+        display: 'grid',
+        gridTemplateColumns: `repeat(${numCols}, 1fr)`,
+        gridTemplateRows: `repeat(${numRows}, 1fr)`,
+      }}
+    >
+      {Array.from({ length: numRows }, (_, row) =>
+        Array.from({ length: numCols }, (_, col) => renderCell(row, col))
       )}
-      
-      {/* River line */}
-      <div className="absolute left-0 right-0 h-1 bg-blue-500/60" style={{ top: `${(11/22) * 100}%` }} />
-      
-      {/* Units */}
-      {units.map(unit => (
-        <GameUnit key={unit.id} unit={unit} />
-      ))}
+
+      <div
+        className="absolute left-0 right-0 h-1 bg-blue-500/60 pointer-events-none"
+        style={{ top: `${(midRow / numRows) * 100}%` }}
+      />
+
+      {units.map(u => <GameUnit key={u.id} unit={u} />)}
     </div>
   );
 };
