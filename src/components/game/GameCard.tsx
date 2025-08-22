@@ -42,8 +42,15 @@ export const GameCard: React.FC<GameCardProps> = ({
       <div className="text-center">
         <div className="text-3xl mb-2 flex justify-center">
           {card.icon ? (() => {
-            const iconMap: { [key: string]: React.ComponentType<any> } = {
-              Users, Target, Shield, Sparkles, Bird, Mountain, Truck, Wrench
+            const iconMap: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
+              Users,
+              Target,
+              Shield,
+              Sparkles,
+              Bird,
+              Mountain,
+              Truck,
+              Wrench,
             };
             const IconComponent = iconMap[card.icon] || Users;
             return <IconComponent size={24} className="text-primary" />;
