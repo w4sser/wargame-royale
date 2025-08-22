@@ -1,47 +1,52 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Unit, Tower, GameState } from '../types/game';
+import { Unit, Tower, GameState, Card } from '../types/cards'; // <-- or '../types/game'
 import deckData from '../data/deck.json';
 
 export const useGameState = () => {
   const [elixir, setElixir] = useState(5);
-  const [hand, setHand] = useState<any[]>([]);
+  const [hand, setHand] = useState<Card[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
   const [towers, setTowers] = useState<Tower[]>([]);
-  const [gameState, setGameState] = useState<GameState>({
-    isGameOver: false,
-    winner: null
-  });
+  const [gameState, setGameState] = useState<GameState>({ isGameOver: false, winner: null });
 
-  // Initialize game
+  // ---------- INIT ----------
   useEffect(() => {
-    // Create random hand
-    const shuffledCards = [...deckData.cards].sort(() => Math.random() - 0.5);
-    setHand(shuffledCards.slice(0, 4));
+    // initial hand
+    const shuffled = [...(deckData.cards as Card[])].sort(() => Math.random() - 0.5);
+    setHand(shuffled.slice(0, 4));
 
-    // Initialize towers
+    // towers (22x9 Clash layout)
+    const NUM_ROWS = 22;
+    const NUM_COLS = 9;
+    const MID_COL   = Math.floor(NUM_COLS / 2); // 4
+    const LEFT_COL  = 2;
+    const RIGHT_COL = NUM_COLS - 3;             // 6
+    const ENEMY_CROWN_ROW  = 2;
+    const ENEMY_KING_ROW   = 0;
+    const PLAYER_CROWN_ROW = NUM_ROWS - 3;      // 19
+    const PLAYER_KING_ROW  = NUM_ROWS - 1;      // 21
+
     setTowers([
-      // Player towers (bottom end)
-      { id: 'player-left', row: 18, col: 2, hp: 1000, maxHp: 1000, player: 'player' },
-      { id: 'player-right', row: 18, col: 7, hp: 1000, maxHp: 1000, player: 'player' },
-      { id: 'player-king', row: 19, col: 4, hp: 1500, maxHp: 1500, player: 'player' },
-      // Enemy towers (top end)
-      { id: 'enemy-left', row: 3, col: 2, hp: 1000, maxHp: 1000, player: 'enemy' },
-      { id: 'enemy-right', row: 3, col: 7, hp: 1000, maxHp: 1000, player: 'enemy' },
-      { id: 'enemy-king', row: 2, col: 4, hp: 1500, maxHp: 1500, player: 'enemy' },
+      // Player (bottom)
+      { id: 'player-left',  row: PLAYER_CROWN_ROW, col: LEFT_COL,  hp: 1000, maxHp: 1000, player: 'player' },
+      { id: 'player-right', row: PLAYER_CROWN_ROW, col: RIGHT_COL, hp: 1000, maxHp: 1000, player: 'player' },
+      { id: 'player-king',  row: PLAYER_KING_ROW,  col: MID_COL,   hp: 1500, maxHp: 1500, player: 'player' },
+
+      // Enemy (top)
+      { id: 'enemy-left',  row: ENEMY_CROWN_ROW, col: LEFT_COL,  hp: 1000, maxHp: 1000, player: 'enemy' },
+      { id: 'enemy-right', row: ENEMY_CROWN_ROW, col: RIGHT_COL, hp: 1000, maxHp: 1000, player: 'enemy' },
+      { id: 'enemy-king',  row: ENEMY_KING_ROW,  col: MID_COL,   hp: 1500, maxHp: 1500, player: 'enemy' },
     ]);
 
-    // Elixir regeneration
-    const elixirInterval = setInterval(() => {
-      setElixir(prev => Math.min(prev + 1, 10));
-    }, 1000);
-
-    return () => clearInterval(elixirInterval);
+    const t = setInterval(() => setElixir(p => Math.min(p + 1, 10)), 1000);
+    return () => clearInterval(t);
   }, []);
+  // -------- END INIT --------
 
-  const deployUnit = useCallback((card: any, row: number, col: number) => {
+  // ---------- FUNCTIONS ----------
+  const deployUnit = useCallback((card: Card, row: number, col: number) => {
     if (elixir < card.cost) return;
 
-    // Determine target lane - move to closest road (col 2 or col 6)
     const targetCol = Math.abs(col - 2) <= Math.abs(col - 6) ? 2 : 6;
 
     const newUnit: Unit = {
@@ -49,16 +54,16 @@ export const useGameState = () => {
       type: card.id,
       row,
       col,
-      hp: card.hp,
-      maxHp: card.hp,
-      damage: card.damage,
-      attackSpeed: card.attackSpeed,
-      speed: card.speed || 1,
+      hp: card.hp ?? 100,
+      maxHp: card.hp ?? 100,
+      damage: card.damage ?? 20,
+      attackSpeed: card.attackSpeed ?? 1.0,
+      speed: card.speed ?? 1,
       player: 'player',
       lastAttack: 0,
-      targetRow: 1, // Move towards enemy king tower
+      targetRow: 1,
       targetCol,
-      flying: card.flying || false
+      flying: !!card.flying,
     };
 
     setUnits(prev => [...prev, newUnit]);
@@ -66,55 +71,44 @@ export const useGameState = () => {
   }, [elixir]);
 
   const updateUnits = useCallback(() => {
+    const MID_ROW = Math.floor(22 / 2); // 11
     setUnits(prev => prev.map(unit => {
-      if (unit.player === 'player') {
-        let newRow = unit.row;
-        let newCol = unit.col;
-        
-        // Move towards target lane first
-        if (Math.abs(unit.col - unit.targetCol) > 0.1) {
-          const colDirection = unit.targetCol > unit.col ? 1 : -1;
-          newCol = unit.col + (colDirection * unit.speed * 0.1);
-        } else {
-          // In target lane, move forward
-          // Check river crossing at row 11 for non-flying units
-          if (!unit.flying && unit.row > 11 && (unit.row - unit.speed * 0.1) < 11) {
-            // Can't cross river unless at bridges (col 2 or 6)
-            if (Math.abs(unit.col - 2) > 0.5 && Math.abs(unit.col - 6) > 0.5) {
-              // Stop at river if not at bridge
-              newRow = 11;
-            } else {
-              newRow = Math.max(1, unit.row - (unit.speed * 0.1));
-            }
+      if (unit.player !== 'player') return unit;
+
+      let newRow = unit.row;
+      let newCol = unit.col;
+
+      if (Math.abs(unit.col - unit.targetCol) > 0.1) {
+        const colDir = unit.targetCol > unit.col ? 1 : -1;
+        newCol = unit.col + (colDir * unit.speed * 0.1);
+      } else {
+        if (!unit.flying && unit.row > MID_ROW && (unit.row - unit.speed * 0.1) < MID_ROW) {
+          if (Math.abs(unit.col - 2) > 0.5 && Math.abs(unit.col - 6) > 0.5) {
+            newRow = MID_ROW;
           } else {
             newRow = Math.max(1, unit.row - (unit.speed * 0.1));
           }
+        } else {
+          newRow = Math.max(1, unit.row - (unit.speed * 0.1));
         }
-        
-        return { ...unit, row: newRow, col: newCol };
       }
-      return unit;
-    }).filter(unit => unit.hp > 0));
+      return { ...unit, row: newRow, col: newCol };
+    }).filter(u => u.hp > 0));
 
-    // Simulate combat with tower protection logic
+    // simple tower damage when adjacent
     setTowers(prev => prev.map(tower => {
-      const nearbyEnemyUnits = units.filter(unit => 
-        unit.player !== tower.player &&
-        Math.abs(unit.row - tower.row) <= 1 &&
-        Math.abs(unit.col - tower.col) <= 1
+      const nearby = units.filter(u =>
+        u.player !== tower.player &&
+        Math.abs(u.row - tower.row) <= 1 &&
+        Math.abs(u.col - tower.col) <= 1
       );
 
-      if (nearbyEnemyUnits.length > 0) {
-        // King tower protection - can only be attacked if side towers are destroyed
+      if (nearby.length > 0) {
         if (tower.id === 'enemy-king') {
-          const leftTower = towers.find(t => t.id === 'enemy-left');
-          const rightTower = towers.find(t => t.id === 'enemy-right');
-          
-          if ((leftTower && leftTower.hp > 0) && (rightTower && rightTower.hp > 0)) {
-            return tower; // King tower is protected
-          }
+          const left = towers.find(t => t.id === 'enemy-left');
+          const right = towers.find(t => t.id === 'enemy-right');
+          if ((left && left.hp > 0) && (right && right.hp > 0)) return tower; // protected
         }
-        
         return { ...tower, hp: Math.max(0, tower.hp - 50) };
       }
       return tower;
@@ -122,24 +116,12 @@ export const useGameState = () => {
   }, [units, towers]);
 
   const checkVictory = useCallback(() => {
-    const playerKingTower = towers.find(t => t.id === 'player-king');
-    const enemyKingTower = towers.find(t => t.id === 'enemy-king');
-
-    if (playerKingTower && playerKingTower.hp <= 0) {
-      setGameState({ isGameOver: true, winner: 'enemy' });
-    } else if (enemyKingTower && enemyKingTower.hp <= 0) {
-      setGameState({ isGameOver: true, winner: 'player' });
-    }
+    const playerKing = towers.find(t => t.id === 'player-king');
+    const enemyKing  = towers.find(t => t.id === 'enemy-king');
+    if (playerKing && playerKing.hp <= 0) setGameState({ isGameOver: true, winner: 'enemy' });
+    else if (enemyKing && enemyKing.hp <= 0) setGameState({ isGameOver: true, winner: 'player' });
   }, [towers]);
+  // -------- END FUNCTIONS --------
 
-  return {
-    elixir,
-    hand,
-    units,
-    towers,
-    gameState,
-    deployUnit,
-    updateUnits,
-    checkVictory
-  };
+  return { elixir, hand, units, towers, gameState, deployUnit, updateUnits, checkVictory };
 };
