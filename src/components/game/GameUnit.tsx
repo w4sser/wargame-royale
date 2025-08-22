@@ -19,8 +19,15 @@ export const GameUnit: React.FC<GameUnitProps> = ({ unit }) => {
   const iconName = cardData?.icon || 'Users';
   
   // Icon mapping
-  const iconMap: { [key: string]: React.ComponentType<any> } = {
-    Users, Target, Shield, Sparkles, Bird, Mountain, Truck, Wrench
+  const iconMap: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
+    Users,
+    Target,
+    Shield,
+    Sparkles,
+    Bird,
+    Mountain,
+    Truck,
+    Wrench,
   };
   
   const IconComponent = iconMap[iconName] || Users;

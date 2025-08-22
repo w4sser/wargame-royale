@@ -1,5 +1,5 @@
 import React from 'react';
-import { Unit, Tower } from '../../types/game';
+import { Unit, Tower, Card } from '../../types/game';
 import { GameUnit } from './GameUnit';
 import { GameTower } from './GameTower';
 
@@ -7,7 +7,7 @@ interface GameGridProps {
   units: Unit[];
   towers: Tower[];
   onCellDrop: (row: number, col: number) => void;
-  draggedCard: any;
+  draggedCard: Card | null;
 }
 
 export const GameGrid: React.FC<GameGridProps> = ({

@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Unit, Tower, GameState } from '../types/game';
+import { Unit, Tower, GameState, Card } from '../types/game';
 import deckData from '../data/deck.json';
 
 export const useGameState = () => {
   const [elixir, setElixir] = useState(5);
-  const [hand, setHand] = useState<any[]>([]);
+  const [hand, setHand] = useState<Card[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
   const [towers, setTowers] = useState<Tower[]>([]);
   const [gameState, setGameState] = useState<GameState>({
@@ -21,13 +21,13 @@ export const useGameState = () => {
     // Initialize towers
     setTowers([
       // Player towers (bottom end)
-      { id: 'player-left', row: 18, col: 2, hp: 1000, maxHp: 1000, player: 'player' },
-      { id: 'player-right', row: 18, col: 7, hp: 1000, maxHp: 1000, player: 'player' },
-      { id: 'player-king', row: 19, col: 4, hp: 1500, maxHp: 1500, player: 'player' },
+      { id: 'player-left', row: 19, col: 2, hp: 1000, maxHp: 1000, player: 'player' },
+      { id: 'player-right', row: 19, col: 6, hp: 1000, maxHp: 1000, player: 'player' },
+      { id: 'player-king', row: 20, col: 4, hp: 1500, maxHp: 1500, player: 'player' },
       // Enemy towers (top end)
-      { id: 'enemy-left', row: 3, col: 2, hp: 1000, maxHp: 1000, player: 'enemy' },
-      { id: 'enemy-right', row: 3, col: 7, hp: 1000, maxHp: 1000, player: 'enemy' },
-      { id: 'enemy-king', row: 2, col: 4, hp: 1500, maxHp: 1500, player: 'enemy' },
+      { id: 'enemy-left', row: 2, col: 2, hp: 1000, maxHp: 1000, player: 'enemy' },
+      { id: 'enemy-right', row: 2, col: 6, hp: 1000, maxHp: 1000, player: 'enemy' },
+      { id: 'enemy-king', row: 1, col: 4, hp: 1500, maxHp: 1500, player: 'enemy' },
     ]);
 
     // Elixir regeneration
@@ -38,7 +38,7 @@ export const useGameState = () => {
     return () => clearInterval(elixirInterval);
   }, []);
 
-  const deployUnit = useCallback((card: any, row: number, col: number) => {
+  const deployUnit = useCallback((card: Card, row: number, col: number) => {
     if (elixir < card.cost) return;
 
     // Determine target lane - move to closest road (col 2 or col 6)

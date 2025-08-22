@@ -5,6 +5,7 @@ import { GameGrid } from './GameGrid';
 import { VictoryBanner } from './VictoryBanner';
 import { useGameState } from '../../hooks/useGameState';
 import { toast } from 'sonner';
+import { Card } from '../../types/game';
 
 export const GameBoard: React.FC = () => {
   const {
@@ -18,7 +19,7 @@ export const GameBoard: React.FC = () => {
     checkVictory
   } = useGameState();
 
-  const [draggedCard, setDraggedCard] = useState<any>(null);
+  const [draggedCard, setDraggedCard] = useState<Card | null>(null);
   const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
   const boardRef = useRef<HTMLDivElement>(null);
 
@@ -31,7 +32,7 @@ export const GameBoard: React.FC = () => {
     return () => clearInterval(interval);
   }, [updateUnits, checkVictory]);
 
-  const handleCardDragStart = (card: any, event: React.DragEvent) => {
+  const handleCardDragStart = (card: Card, event: React.DragEvent) => {
     setDraggedCard(card);
     toast(`Deploying ${card.name}!`);
   };
